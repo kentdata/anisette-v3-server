@@ -204,15 +204,18 @@ class AnisetteService {
 		auto otp = v1Adi.requestOTP(dsId);
 		import std.conv;
 		import std.json;
-		JSONValue responseJson = [
-			"X-Apple-I-Client-Time": time.toISOExtString.split('.')[0] ~ "Z",
+		
+		 auto istTime = time + hours(5) + minutes(30);
+		
+		 JSONValue responseJson = [
+			"X-Apple-I-Client-Time": time.toISOExtString.split('.')[0] ~ "+05:30",
 			"X-Apple-I-MD":  Base64.encode(otp.oneTimePassword),
 			"X-Apple-I-MD-M": Base64.encode(otp.machineIdentifier),
 			"X-Apple-I-MD-RINFO": to!string(17106176),
 			"X-Apple-I-MD-LU": v1Device.localUserUUID,
 			"X-Apple-I-SRL-NO": "0",
 			"X-MMe-Client-Info": v1Device.serverFriendlyDescription,
-			"X-Apple-I-TimeZone": time.timezone.dstName,
+			"X-Apple-I-TimeZone": "Asia/Kolkata",
 			"X-Apple-Locale": "en_US",
 			"X-Mme-Device-Id": v1Device.uniqueDeviceIdentifier,
 		];
