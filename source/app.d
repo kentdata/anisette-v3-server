@@ -189,42 +189,9 @@ class AnisetteService {
 	@method(HTTPMethod.GET)
 	@path("/")
 	void handleV1Request(HTTPServerRequest req, HTTPServerResponse res) {
-		import std.datetime.systime;
-		import std.datetime.timezone;
-		import core.time;
-		auto log = getLogger();
-		log.info("[<<] anisette-v1 request");
-		auto time = Clock.currTime();
-
-		if (!v1Adi.isMachineProvisioned(dsId)) {
-			ProvisioningSession provisioningSession = new ProvisioningSession(v1Adi, v1Device);
-			provisioningSession.provision(dsId);
-			log.info("Provisioning done!");
-		}
-		
-		auto otp = v1Adi.requestOTP(dsId);
-
-		import std.conv;
-		import std.json;
-
-		JSONValue responseJson = [
-			"X-Apple-I-Client-Time": time.toISOExtString.split('.')[0] ~ "Z",
-			"X-Apple-I-MD":  Base64.encode(otp.oneTimePassword),
-			"X-Apple-I-MD-M": Base64.encode(otp.machineIdentifier),
-			"X-Apple-I-MD-RINFO": to!string(17106176),
-			"X-Apple-I-MD-LU": v1Device.localUserUUID,
-			"X-Apple-I-SRL-NO": "0",
-			"X-MMe-Client-Info": v1Device.serverFriendlyDescription,
-			"X-Apple-I-TimeZone": time.timezone.dstName,
-			"X-Apple-Locale": "en_US",
-			"X-Mme-Device-Id": v1Device.uniqueDeviceIdentifier,
-		];
-
-		res.headers["Implementation-Version"] = brandingCode;
-		res.writeBody(responseJson.toString(JSONOptions.doNotEscapeSlashes), "application/json");
-		log.infoF!"[>>] 200 OK %s"(responseJson);
+		res.statusCode = HTTPStatus.notFound;
+		res.writeBody("Anisette V1 disabled");
 	}
-
 	@method(HTTPMethod.GET)
 	@path("/v3/client_info")
 	void getClientInfo(HTTPServerRequest req, HTTPServerResponse res) {
